@@ -16,11 +16,25 @@ jobs:
     steps:
       - name: Checkout the repository to the github actions runner container
         uses: actions/checkout@v5
+        with:
+          submodules: recursive # Checkout submodules too | https://stackoverflow.com/questions/65077036/how-to-checkout-submodule-in-github-action
       - name: setup java 21
         uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'oracle'
+      - name: Setup Android SDK # https://github.com/android-actions/setup-android
+        uses: android-actions/setup-android@v3
+      - name: Setup NDK # https://github.com/nttld/setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r28c # https://github.com/android/ndk/releases/tag/r28c ~ ndkVersion "28.2.13676358"
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      - name: Setup cmake # https://github.com/jwlawson/actions-setup-cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '4.1.2'
       - name: Build and package the apk
         shell: bash
         run: |
