@@ -4,8 +4,14 @@
 
 #include <ballbalancing.hpp>
 #include <android/input.h>
+#include "android_native_app_glue.h"
+#include <android/window.h>
 
 BallBalancingGame::BallBalancingGame() {
+    // Android App Config to keep the screen on always when this app is opened
+    android_app *app = GetAndroidApp();
+    ANativeActivity_setWindowFlags(app->activity, AWINDOW_FLAG_KEEP_SCREEN_ON, 0);
+    // Game code start from here
     LOGI("Ball Balancing Game Starting..... !!!");
     SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(0, 0, "Hi");
@@ -78,11 +84,9 @@ void BallBalancingGame::gamePlay(int level) {
         ball->move();
         /* Draw the objects */
         BeginDrawing();
-//        UpdateCamera(&camera, CAMERA_THIRD_PERSON);
         ClearBackground(BLACK);
         {
             BeginMode3D(*gameCamera->getCamera());
-//            BeginMode3D(camera);
             {
                 grid->draw();
                 ball->draw();
