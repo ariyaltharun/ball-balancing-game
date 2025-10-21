@@ -1020,6 +1020,9 @@ RLAPI Image GetClipboardImage(void);                              // Get clipboa
 RLAPI void EnableEventWaiting(void);                              // Enable waiting for events on EndDrawing(), no automatic event polling
 RLAPI void DisableEventWaiting(void);                             // Disable waiting for events on EndDrawing(), automatic events polling
 
+// Android-related functions
+RLAPI struct android_app *GetAndroidApp(void);
+
 // Cursor-related functions
 RLAPI void ShowCursor(void);                                      // Shows cursor
 RLAPI void HideCursor(void);                                      // Hides cursor
