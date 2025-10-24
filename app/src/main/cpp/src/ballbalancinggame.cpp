@@ -21,27 +21,25 @@ BallBalancingGame::BallBalancingGame() {
     screenWidth = GetScreenWidth();
     screenHeight = GetScreenHeight();
     gameState = GameState::START_SCREEN;
+    touch = {0.0f, 0.0f};
 }
 
 void BallBalancingGame::startScreen() {
     LOGI("Start Screen!!");
-    Vector2 touch = {0.0f, 0.0f};
     Rectangle start_option = {static_cast<float>(0.1*screenWidth), static_cast<float>(0.4*screenHeight), static_cast<float>(0.8*screenWidth), static_cast<float>(0.07*screenHeight)};
     Rectangle level_option = {static_cast<float>(0.1*screenWidth), static_cast<float>(0.5*screenHeight), static_cast<float>(0.8*screenWidth), static_cast<float>(0.07*screenHeight)};
     Rectangle quit_option = {static_cast<float>(0.1*screenWidth), static_cast<float>(0.6*screenHeight), static_cast<float>(0.8*screenWidth), static_cast<float>(0.07*screenHeight)};
 
     while (gameState == GameState::START_SCREEN) {
         /* Handle Events */
-        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-            touch.x = GetMouseX();
-            touch.y = GetMouseY();
-        }
+        listenForTouchPoints();
         if (CheckCollisionPointRec(touch, start_option)) {
             DrawText("Starting Game", 10, 30, 20, BLUE);
             gameState = GameState::GAMEPLAY_SCREEN;
             gamePlay(0);
         } else if (CheckCollisionPointRec(touch, level_option)) {
             DrawText("Options levels: Yet to Implement", 10, 30, 20, BLUE);
+            gameState = GameState::LEVEL_SCREEN;
             levelsScreen();
         } else if (CheckCollisionPointRec(touch, quit_option)) {
             DrawText("Quiting Game...", 10, 30, 20, BLUE);
@@ -61,7 +59,7 @@ void BallBalancingGame::startScreen() {
             DrawRectangleRec(quit_option, RED);
             DrawText("Quit Game", 0.33*screenWidth, 0.62*screenHeight, 50, RAYWHITE);
             // Footer Text
-            DrawText("Made with  by Ariyal with Raylib", 0.1*screenWidth, 0.95*screenHeight, 25, RAYWHITE);
+            DrawText("Made with  by Ariyal with Raylib", 0.25*screenWidth, 0.95*screenHeight, 25, RAYWHITE);
         }
         EndDrawing();
         // Reset Touch
@@ -71,6 +69,36 @@ void BallBalancingGame::startScreen() {
 
 void BallBalancingGame::levelsScreen() {
     // TODO: Add Levels Screen and Navigate to specific level
+    std::vector<Rectangle> rects;
+    float levelBoxSz = 0.2*screenWidth;
+    rects.push_back({ 0.1f * screenWidth, 0.3f * screenWidth, levelBoxSz, levelBoxSz });
+    rects.push_back({ 0.4f * screenWidth, 0.3f * screenWidth, levelBoxSz, levelBoxSz });
+    rects.push_back({ 0.7f * screenWidth, 0.3f * screenWidth, levelBoxSz, levelBoxSz });
+    int levelDisplay = 1;
+    while (gameState == GameState::LEVEL_SCREEN) {
+        /* Handle the input */
+        listenForTouchPoints();
+        // List for level selection
+        for (int level = 1; level <= rects.size(); level++) {
+            if (CheckCollisionPointRec(touch, rects[level - 1])) {
+                gameState = GameState::GAMEPLAY_SCREEN;
+                gamePlay(level);
+            }
+        }
+        // Draw the level screen
+        BeginDrawing();
+        {
+            DrawText("Select Levels", 0.13f * screenWidth, 0.05f * screenHeight, 80, BLUE);
+            levelDisplay = 1;
+            for (Rectangle rect: rects) {
+                DrawRectangleRec(rect, GRAY);
+                DrawText(TextFormat("%d", levelDisplay++), rect.x + 0.3*levelBoxSz, rect.y + 0.2*levelBoxSz, 100, RED);
+            }
+        }
+        EndDrawing();
+        // Reset Touch
+        touch = {0.0f, 0.0f};
+    }
 }
 
 void BallBalancingGame::gamePlay(int level) {
@@ -100,6 +128,13 @@ void BallBalancingGame::gamePlay(int level) {
 void BallBalancingGame::run() {
     /* All Game states should be managed here */
     startScreen();
+}
+
+/* Method to listen for touch points and store in variable vector touch */
+void BallBalancingGame::listenForTouchPoints() {
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        touch = {(float)GetMouseX(), (float)GetMouseY()};
+    }
 }
 
 BallBalancingGame::~BallBalancingGame() {

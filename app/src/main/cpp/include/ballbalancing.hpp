@@ -32,6 +32,10 @@ private:
     void startScreen();
     void levelsScreen();
     void gamePlay(int level);
+
+    /* detect and store touch points */
+    Vector2 touch;
+    void listenForTouchPoints();
 public:
     BallBalancingGame();
     void run();
