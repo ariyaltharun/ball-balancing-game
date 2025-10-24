@@ -12,8 +12,8 @@ Grid::Grid() {
     xLimit = col*cellSz;
     yLimit = row*cellSz;
     grid = std::vector(row, std::vector<int>(col, 0));
-    startPos = {4*cellSz+cellSz/2.0f, 7*cellSz+cellSz/2.0f, 0.0f};
     designGrid();
+    initializeStartEnd();
 }
 
 void Grid::draw() {
@@ -54,12 +54,26 @@ void Grid::designGrid() {
     };
 }
 
+void Grid::initializeStartEnd() {
+    LOGI("Initializing start and end point in the grid");
+    for (int r=0; r<row; r++)
+        for (int c=0; c<col; c++)
+            if (grid[r][c] == 2)
+                startPos = { c * cellSz + cellSz/2.0f, r * cellSz + cellSz/2.0f, 0.0f };
+            else if (grid[r][c] == 3)
+                endPos = { (float)c, (float)r, 0.0f };
+}
+
 int Grid::getCellSz() {
     return cellSz;
 }
 
 Vector3 Grid::getStartPos() {
     return startPos;
+}
+
+Vector3 Grid::getEndPos() {
+    return endPos;
 }
 
 int Grid::getXLimit() {
@@ -73,5 +87,3 @@ int Grid::getYLimit() {
 Grid::~Grid() {
 
 }
-
-

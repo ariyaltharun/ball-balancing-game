@@ -23,6 +23,7 @@ class BallBalancingGame {
 private:
     /* Screen Height & Width */
     int screenHeight, screenWidth;
+
     /* Game Object */
     Ball *ball{};
     GameCamera *gameCamera{};
@@ -32,6 +33,9 @@ private:
     void startScreen();
     void levelsScreen();
     void gamePlay(int level);
+
+    /* Game Parameters */
+    int startTime;
 
     /* detect and store touch points */
     Vector2 touch;

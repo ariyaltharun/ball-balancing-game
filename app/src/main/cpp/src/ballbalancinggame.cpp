@@ -21,15 +21,14 @@ BallBalancingGame::BallBalancingGame() {
     screenWidth = GetScreenWidth();
     screenHeight = GetScreenHeight();
     gameState = GameState::START_SCREEN;
-    touch = {0.0f, 0.0f};
 }
 
 void BallBalancingGame::startScreen() {
     LOGI("Start Screen!!");
+    touch = {0.0f, 0.0f};
     Rectangle start_option = {static_cast<float>(0.1*screenWidth), static_cast<float>(0.4*screenHeight), static_cast<float>(0.8*screenWidth), static_cast<float>(0.07*screenHeight)};
     Rectangle level_option = {static_cast<float>(0.1*screenWidth), static_cast<float>(0.5*screenHeight), static_cast<float>(0.8*screenWidth), static_cast<float>(0.07*screenHeight)};
     Rectangle quit_option = {static_cast<float>(0.1*screenWidth), static_cast<float>(0.6*screenHeight), static_cast<float>(0.8*screenWidth), static_cast<float>(0.07*screenHeight)};
-
     while (gameState == GameState::START_SCREEN) {
         /* Handle Events */
         listenForTouchPoints();
@@ -106,10 +105,18 @@ void BallBalancingGame::gamePlay(int level) {
     grid = new Grid();
     gameCamera = GameCamera::getInstance(grid->getStartPos());
     ball = new Ball(grid->getStartPos());
+    startTime = 0;
     /* Game Loop */
     while (gameState == GameState::GAMEPLAY_SCREEN) {
         /* Update Movable object in game */
         ball->move();
+        // After five seconds of game end, return to start screen
+        if (startTime > 0 && ((int)GetTime() - startTime) >= 5) {
+            gameState = GameState::START_SCREEN;
+            startScreen();
+            LOGI("Moving to start screen");
+            exit(-1);
+        }
         /* Draw the objects */
         BeginDrawing();
         ClearBackground(BLACK);
@@ -120,6 +127,20 @@ void BallBalancingGame::gamePlay(int level) {
                 ball->draw();
             }
             EndMode3D();
+            // Conditions to check when you loose or win the game
+            if (ball->getGameStatus() == "LOOSE") {
+                DrawText("You LOST the game", 10, 40, 10, RED);
+                Rectangle prompt = {static_cast<float>(0.1*screenWidth), static_cast<float>(0.4*screenHeight), static_cast<float>(0.8*screenWidth), static_cast<float>(0.07*screenHeight)};
+                DrawRectangleRec(prompt, RED);
+                DrawText("YOU LOST", 0.33 * screenWidth, 0.42 * screenHeight, 50, RAYWHITE);
+                if (startTime == 0) startTime = (int)GetTime();
+            } else if (ball->getGameStatus() == "WIN") {
+                DrawText("You WON the game", 10, 40, 10, GREEN);
+                Rectangle prompt = {static_cast<float>(0.1*screenWidth), static_cast<float>(0.4*screenHeight), static_cast<float>(0.8*screenWidth), static_cast<float>(0.07*screenHeight)};
+                DrawRectangleRec(prompt, GREEN);
+                DrawText("YOU WON", 0.33 * screenWidth, 0.42 * screenHeight, 50, RAYWHITE);
+                if (startTime == 0) startTime = (int)GetTime();
+            }
         }
         EndDrawing();
     }

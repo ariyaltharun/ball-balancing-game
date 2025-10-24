@@ -20,10 +20,12 @@ private:
     GameCamera *gameCamera;
     void restrictBallMovement();
     bool isOnGrid();
+    std::string gameStatus;
 public:
     Grid *grid = nullptr;
     Ball(Vector3 initPosition);
     void draw();
     void move();
+    std::string getGameStatus();
     ~Ball();
 };

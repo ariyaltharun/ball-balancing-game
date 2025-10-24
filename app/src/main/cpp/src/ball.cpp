@@ -19,6 +19,8 @@ Ball::Ball(Vector3 initPosition) {
     acceleration = 20.0f;
     gameCamera = GameCamera::getInstance(position);
     grid = new Grid();
+
+    gameStatus = "PLAYING";
 }
 
 /* Draw Ball on the screen */
@@ -49,9 +51,13 @@ bool Ball::isOnGrid() {
     int cellSz = grid->getCellSz();
     int c = position.x/cellSz, r = position.y/cellSz;
     DrawText(TextFormat("Grid: (%d, %d)", c, r), 10, 30, 10, PURPLE);
+    // Logic to say, whether you win or loose
+    if (c == (int)grid->getEndPos().x && r == (int)grid->getEndPos().y && fabs(velocity.x) <= 0.1f && fabs(velocity.y) <= 0.1f)
+        gameStatus = "WIN";
+    if (position.z > 0) gameStatus = "LOOSE";
     if (grid->grid[r][c] == 0 || position.z >= 0) {
         DrawText("Ball is off Grid", 10, 20, 10, RED);
-        velocity.z += 10 * gravity * GetFrameTime();
+        velocity.z += 20 * gravity * GetFrameTime();
         position.z += velocity.z * GetFrameTime();
         return false;
     }
@@ -84,9 +90,11 @@ void Ball::moveAlongAxis(float &velocityAxis, float &positionAxis, float accelSe
      * Sign denotes which direction to move
      * Velocity Decay = ??? | What is stopping velocity
      *
+     * Move the ball only if the ball center is above the block
+     *
      * */
-    if (fabs(accelSenAxis) >= 2.0f) {
-        velocityAxis += (10*accelSenAxis) * GetFrameTime();
+    if (position.z <= 0 && fabs(accelSenAxis) >= 1.2f && gameStatus == "PLAYING") {
+        velocityAxis += (20*accelSenAxis) * GetFrameTime();
         LOGD("Ball is moving");
         positionAxis += velocityAxis * GetFrameTime();
     } else {
@@ -98,6 +106,10 @@ void Ball::moveAlongAxis(float &velocityAxis, float &positionAxis, float accelSe
             velocityAxis = 0.0f;
         }
     }
+}
+
+std::string Ball::getGameStatus() {
+    return gameStatus;
 }
 
 /* Destructor */

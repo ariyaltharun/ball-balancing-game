@@ -13,6 +13,7 @@ private:
     int row = 0; // Denotes Y Axis
     int col = 0; // Denotes X Axis
     int cellSz = 0;
+    void initializeStartEnd();
     Vector3 startPos;
     Vector3 endPos;
     int xLimit, yLimit;
@@ -22,6 +23,7 @@ public:
     void designGrid();
     void draw();
     Vector3 getStartPos();
+    Vector3 getEndPos();
     int getXLimit();
     int getYLimit();
     int getCellSz();
